@@ -14,7 +14,7 @@ OPTIONS:
     -h, --help 
         Output a usage message and exit.
     -d, --display
-        Displays the Image in Imagemagick Display
+        Displays the Image in geeqie
         Careful, when used with directories
     -w, --write
         Writes the Commentheader in the Picture
@@ -34,11 +34,13 @@ REFERENCES:
         imagemagick
         curl
         jq
+	geeqie
     
 AUTHOR: <turowskipa64071@th-nuernberg.de>
 '
 HISTORY='
     07-Jan-2025     First version
+    16-Jan-2025	    Version 0.1
 '
 #---------------------------------------------------------------------------
 
