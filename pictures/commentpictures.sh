@@ -5,7 +5,7 @@ NAME: commentpictures
 
 SYNOPSIS:  [--help] [--verbose] [--display] <FILE LIST> <Directory>
 
-DESCRIPTION: This script adds "Strasse und Hausnummer, Stadt, Bundesland, Staat" to the metadata of pictures. Works for jpg, jpeg. To add other Formats please change script.
+DESCRIPTION: This script adds "Strasse und Hausnummer, Stadt, Bundesland, Staat" to the metadata of pictures, if data is available from the online api. Works for jpg, jpeg. To add other Formats please change script.
              Do not use lower and upper case letters in the same ending, that is just cruel.
 
 PARAMETERS:  -d [Directory] -f [files]
@@ -54,7 +54,7 @@ myname=$(basename "${0%.*sh}")
 hash exiftool 2>/dev/null || { echo >&2 "FATAL: I require exiftool but it's not installed.  Aborting."; exit 1; }
 hash convert 2>/dev/null || { echo >&2 "FATAL: I require imagemagick but it's not installed.  Aborting."; exit 1; }
 hash curl 2>/dev/null || { echo >&2 "FATAL: I require curl but it's not installed.  Aborting."; exit 1; }
-hash jq 2>/dev/null || { echo >&2 "FATAL: I require jasonquery but it's not installed.  Aborting."; exit 1; }
+hash jq 2>/dev/null || { echo >&2 "FATAL: I require jq but it's not installed.  Aborting."; exit 1; }
 hash geeqie 2>/dev/null || { echo >&2 "FATAL: I require geeqie but it's not installed.  Aborting."; exit 1; }
 
 
@@ -109,6 +109,8 @@ comment_picture()
         echo $long
     fi
 
+    [[ $VerboseMode = 1 ]] && echo "Latitude: $lat Longitude: $long"
+
     #check if Picture has no Coordinates
     if [ -z "$lat" ] || [ -z "$long" ] ; then
         echo "ERROR: Image $filename has no Coordinates"  >> /dev/stderr
@@ -120,7 +122,7 @@ comment_picture()
     [[ $VerboseMode = 1 ]] && curl -s "https://nominatim.openstreetmap.org/reverse?lat=$lat&lon=$long&format=json&accept-language=en&zoom=18"
 
     #Get Data from Api
-    text=$(curl -s "https://nominatim.openstreetmap.org/reverse?lat=$lat&lon=$long&format=json&accept-language=en&zoom=18" | jq -r '.address.road, .address.city, .address.county, .address.state, .address.country | select(. != null)' |
+    text=$(curl -s "https://nominatim.openstreetmap.org/reverse?lat=$lat&lon=$long&format=json&accept-language=en&zoom=18" | jq -r '.address.house_number, .address.road, .address.city, .address.county, .address.state, .address.country | select(. != null)' |
 	    tr -s '\n' ', ' | sed '$s/,$//' )
 
     echo -n .
@@ -143,7 +145,7 @@ comment_picture()
     echo -n .
 
     #Display Picture
-    [[ $DisplayMode = 1 ]] && geeqie $filename
+    [[ $DisplayMode = 1 ]] && geeqie $filename #show comments
 }
 
 #---------------------------------------------------------------------------
