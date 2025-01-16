@@ -98,6 +98,9 @@ while [[ -n "${1-}" ]] ; do
         echo '$image bearbeitet'
     done
 
+    # TODO use jpegoptim to optimze the size of jpegs
+
+
     find $inputdir -type f \( -iname '*.jpg' -o -iname '*.jpeg' -o -iname '*.png' -o -iname '*.gif' \) | while read -r image; do
     	echo 'Moving $image to folder of Year/Month...'
         exiftool -o . -d '%Y/%b' '-Directory<$DateTimeOriginal' "$image"
