@@ -136,8 +136,12 @@ comment_picture()
     fi
 
     #Add Text as Metadata Comment
-    #Anhängen nicht löschen(mehrfach schreiben) oder ähnliches steht schon was drinnen??
-    exiftool -Comment="$text" $filename >> /dev/null
+    if [[ exiftool -comment $filename = "" ]]
+    	exiftool -Comment="$text" $filename >> /dev/null
+    else
+    	echo "Warning: $filename already has a comment. Did not overwrite please change manually."
+     	echo $text
+    fi
 
     echo -n .
 
