@@ -5,8 +5,11 @@ NAME: commentpictures
 
 SYNOPSIS:  [--help] [--verbose] [--display] <FILE LIST> <Directory>
 
-DESCRIPTION: This script adds "Strasse und Hausnummer, Stadt, Bundesland, Staat" to the metadata of pictures, if data is available from the online api. Works for jpg, jpeg. To add other Formats please change script.
+DESCRIPTION: This script adds "Strasse und Hausnummer, Stadt, Bundesland, Staat" to the metadata of pictures, if data is available from the online api.
+             If a comment already exists it will not be replaced.
+             Works for jpg, jpeg. To add other Formats please change script.
              Do not use lower and upper case letters in the same ending, that is just cruel.
+             Useage with directory as input works recursive.
 
 PARAMETERS:  -d [Directory] -f [files]
         
@@ -74,7 +77,7 @@ while [[ "${1-}" =~ ^- ]] ; do
 
         -d | --display)     DisplayMode=1 ;;
 
-        -w | --write)       WriteMode = 1 ;;
+        -w | --write)       WriteMode = 1 ;; #leftover from previous attempts
         
         --)                 shift ; break ;;
             
@@ -135,13 +138,15 @@ comment_picture()
         exit 1
     fi
 
-    #Add Text as Metadata Comment
-    if [[ exiftool -comment $filename = "" ]]
-    	exiftool -Comment="$text" $filename >> /dev/null
+    #Add Text as Metadata XPComment , XP Comment, because Geeqie doesnt display Comment properly
+    if [[ $(exiftool -XPComment "$filename" | awk -F': ' '{print $2}') =~ ^[[:space:]]*$ ]]; then
+    	exiftool -XPComment="$text" $filename >> /dev/null
+
     else
-    	echo "Warning: $filename already has a comment. Did not overwrite please change manually."
+    	echo -e "\nWarning: $filename already has a comment. Did not overwrite please change manually."
      	echo $text
     fi
+
 
     echo -n .
 
