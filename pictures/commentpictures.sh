@@ -45,6 +45,7 @@ AUTHOR: <turowskipa64071@th-nuernberg.de>
 HISTORY='
     07-Jan-2025     First version
     16-Jan-2025	    Version 0.1
+    21-Jan-2025     Abgabe Version
 '
 #---------------------------------------------------------------------------
 
