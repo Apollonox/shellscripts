@@ -5,14 +5,16 @@ NAME: commentpictures
 
 SYNOPSIS:  [--help] [--verbose] [--display] [--write] <FILE LIST> <Directory>
 
-DESCRIPTION: This script adds "Strasse und Hausnummer, Stadt, Bundesland, Staat" to the metadata of pictures, if data is available from the online api.
-             If a comment already exists it will not be replaced.
+DESCRIPTION: This script adds "Strasse und Hausnummer, Stadt, Bundesland, Staat to the metadata of pictures,
+             if data is available from the online api of nominatim.
+             If a comment already exists it will not be replaced, but written on the commandline for manual change.
+             Use Display option to open geeqie, then open the Exif Window with Ctrl+E to see the Comment.
              Works for jpg, jpeg. To add other Formats please change script.
              Do not use lower and upper case letters in the same ending, that is just cruel.
              Useage with directory as input works recursive.
-	     If you want you can write the comment on the picture, does not check if there is already text.
+             If you want you can write the comment on the picture, does not check if there is already text.
 
-PARAMETERS:  -d -w [files]
+PARAMETERS: [files] are the pictures that are to be commented
         
 OPTIONS:
     -h, --help 
@@ -38,7 +40,7 @@ REFERENCES:
         imagemagick
         curl
         jq
-	geeqie
+        geeqie
     
 AUTHOR: <turowskipa64071@th-nuernberg.de>
 '
@@ -102,10 +104,10 @@ fi
 #---------------------------------------------------------------------------
 comment_picture()
 {
-    filename=$1
+    filename="$1"
     #Get Lat and Log as GPS Degree
-    lat=$(exiftool -gpslatitude -nt $filename | cut -d":" -f2 | tr -d ' ' | tr -s 'deg' ' ' | tr -s "'" " " | tr -d '"NEWS' | awk ' {printf("%.4f", $1+$2/60+$3/3600)}' )
-    long=$(exiftool  -gpslongitude -nt $filename | cut -d":" -f2 | tr -d ' ' | tr -s 'deg' ' ' | tr -s "'" " " | tr -d '"NEWS'| awk ' {printf("%.4f", $1+$2/60+$3/3600)}')
+    lat=$(exiftool -gpslatitude -nt "$filename" | cut -d":" -f2 | tr -d ' ' | tr -s 'deg' ' ' | tr -s "'" " " | tr -d '"NEWS' | awk ' {printf("%.4f", $1+$2/60+$3/3600)}' )
+    long=$(exiftool  -gpslongitude -nt "$filename" | cut -d":" -f2 | tr -d ' ' | tr -s 'deg' ' ' | tr -s "'" " " | tr -d '"NEWS'| awk ' {printf("%.4f", $1+$2/60+$3/3600)}')
 
     #Get N/S W/E REFERENCES
     if [ "exiftool -gpslatituderef -nf" = "South" ] ; then
@@ -186,7 +188,7 @@ while [[ -n "${1-}" ]] ; do
     #Test if Input is Directory
     elif [ -d "$filename" ]; then
         echo "Files in Folder $filename will be processed"
-        find $filename -type f \( -iname '*.jpg' -o -iname '*.jpeg' -o -iname '*.png' -o -iname '*.JPEG' -iname '*.JPG' \) | while read -r image; do
+        find $filename -type f \( -iname '*.jpg' -o -iname '*.jpeg' -o -iname '*.png' -o -iname '*.JPEG' -iname '*.JPG' -o -iname '*.PNG' \) | while read -r image; do
             comment_picture "$image"
         done
 
