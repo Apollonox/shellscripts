@@ -3,15 +3,16 @@
 ManPage='
 NAME: commentpictures
 
-SYNOPSIS:  [--help] [--verbose] [--display] <FILE LIST> <Directory>
+SYNOPSIS:  [--help] [--verbose] [--display] [--write] <FILE LIST> <Directory>
 
 DESCRIPTION: This script adds "Strasse und Hausnummer, Stadt, Bundesland, Staat" to the metadata of pictures, if data is available from the online api.
              If a comment already exists it will not be replaced.
              Works for jpg, jpeg. To add other Formats please change script.
              Do not use lower and upper case letters in the same ending, that is just cruel.
              Useage with directory as input works recursive.
+	     If you want you can write the comment on the picture, does not check if there is already text.
 
-PARAMETERS:  -d [Directory] -f [files]
+PARAMETERS:  -d -w [files]
         
 OPTIONS:
     -h, --help 
@@ -44,12 +45,14 @@ AUTHOR: <turowskipa64071@th-nuernberg.de>
 HISTORY='
     07-Jan-2025     First version
     16-Jan-2025	    Version 0.1
+    21-Jan-2025     Abgabe Version
 '
 #---------------------------------------------------------------------------
 
 # Default values for options - feel free to change
 VerboseMode=0
 DisplayMode=0
+WriteMode=0
 
 
 # Internal variables
@@ -77,7 +80,7 @@ while [[ "${1-}" =~ ^- ]] ; do
 
         -d | --display)     DisplayMode=1 ;;
 
-        -w | --write)       WriteMode = 1 ;; #leftover from previous attempts
+        -w | --write)       WriteMode = 1 ;; #leftover from previous attempts, will write the Comment on the picture
         
         --)                 shift ; break ;;
             
@@ -151,7 +154,7 @@ comment_picture()
     echo -n .
 
     #Add Text to Picture
-    [[ WriteMode = 1 ]] && convert $filename -gravity South -background Black -fill White -pointsize 25 -annotate +0+0 "$text" $filename >> /dev/null
+    [[ $WriteMode = 1 ]] && convert $filename -gravity South -background Black -fill White -pointsize 25 -annotate +0+0 "$text" $filename >> /dev/null
 
     echo -n .
 
